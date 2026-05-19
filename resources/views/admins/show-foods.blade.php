@@ -9,6 +9,10 @@
                         <h5 class="card-title mb-4 d-inline">Foods</h5>
                         <a href="{{ route('admin.foods.create') }}"
                             class="btn btn-primary mb-4 text-center float-right">Create Foods</a>
+                            <a href="{{ route('admin.category.create') }}" style="margin-right: 10px;"
+                            class="btn btn-primary mb-4 text-center float-right">Add Category</a>
+                            <a href="{{ route('admin.foods.create') }}" style="margin-right: 10px;"
+                            class="btn btn-primary mb-4 text-center float-right">edit Category</a>
 
                         <table class="table">
                             <thead>
@@ -19,6 +23,7 @@
                                     <th scope="col">category</th>
                                     <th scope="col">description</th>
                                     <th scope="col">price</th>
+                                    <th scope="col">Edit</th>
                                     <th scope="col">delete</th>
                                 </tr>
                             </thead>
@@ -32,7 +37,7 @@
                                                 width="50">
 
                                         </td>
-                                        <td>{{ $food->category }}</td>
+                                        <td>{{ $food->category_id }}</td>
                                         <td>{{ $food->description }}</td>
                                         <td>${{ $food->price }}</td>
                                         <td>

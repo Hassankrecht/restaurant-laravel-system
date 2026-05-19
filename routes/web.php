@@ -78,6 +78,8 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::get('/foods/{id}/edit', [AdminsController::class, 'editFood'])->name('foods.edit');
     Route::put('/foods/{id}', [AdminsController::class, 'updateFood'])->name('foods.update');
     Route::delete('/foods/{id}', [AdminsController::class, 'destroyFood'])->name('foods.delete');
+    Route::get('/categories-create', [AdminsController::class, 'createCategory'])->name('category.create');
+    Route::post('/categories-store', [AdminsController::class, 'storeCategory'])->name('category.store');
 
     // Bookings
     Route::get('/bookings', [AdminsController::class, 'showBookings'])->name('bookings');

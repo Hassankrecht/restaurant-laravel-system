@@ -56,7 +56,7 @@
                 <a href="{{ url('/') }}" class="navbar-brand p-0">
                     <h1 class="text-primary m-0">
                         <i class="fa fa-utensils me-3"></i>
-                        <span class="notranslate">Restoran</span>
+                        <span class="notranslate">ALBASHA</span>
                     </h1>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"

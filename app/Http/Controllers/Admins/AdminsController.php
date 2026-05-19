@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Admin\Admin; // تأكد من وجود هذا الموديل في المسار الصحيح
+use App\Models\Food\Category;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Food\Checkout; // تأكد من وجود هذا الموديل في المسار الصحيح
 use App\Models\Food\Food; // تأكد من وجود هذا الموديل في المسار الصحيح
@@ -137,9 +138,9 @@ class AdminsController extends Controller
         return redirect()->route('admin.foods')->with('success', 'Food deleted successfully.');
     }
 
-    public function createFood()
-    {
-        return view('admins.create-food');
+    public function createFood(){
+    $categories = Category::all(); // يجب جلبها من جدول categories الحقيقي
+return view('admins.create-food', compact('categories'));
     }
     public function storeFood(Request $request)
 {
@@ -147,7 +148,8 @@ class AdminsController extends Controller
         'name' => 'required|string|max:255',
         'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         'description' => 'required|string|max:1000',
-        'category' => 'required|string|max:255',
+        'categories_id' => 'required|exists:categories,id',
+
         'price' => 'required|numeric|min:0',
     ]);
 
@@ -164,7 +166,7 @@ class AdminsController extends Controller
         'name' => $request->name,
         'image' => $imageName,  // فقط اسم الصورة
         'description' => $request->description,
-        'category' => $request->category,
+        'category_id' => $request->categories_id,
         'price' => $request->price,
     ]);
 
@@ -173,41 +175,38 @@ class AdminsController extends Controller
 public function editFood($id)
     {
         $food = Food::findOrFail($id);
-        return view('admins.edit-foods', compact('food'));
+        $categories = Category::all(); // يجب جلبها من جدول categories الحقيقي
+        return view('admins.edit-foods', compact('food','categories'));
     }
 
     public function updateFood(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-        'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         'description' => 'required|string|max:1000',
-        'category' => 'required|string|max:255',
+        'category_id' => 'required|exists:categories,id',
         'price' => 'required|numeric|min:0',
-        ]);
+    ]);
 
-         $image = $request->file('image');
-    $imageName = $image->getClientOriginalName();
-    $imagePath = public_path('img/' . $imageName);
+    $food = Food::findOrFail($id);
 
-    // إذا لم تكن الصورة موجودة، احفظها
-    if (!file_exists($imagePath)) {
+    if ($request->hasFile('image')) {
+        $image = $request->file('image');
+        $imageName = $image->getClientOriginalName();
         $image->move(public_path('img'), $imageName);
-    }
-
-        $food = Food::findOrFail($id);
-
-        $food->name = $request->name;
         $food->image = $imageName;
-        $food->description = $request->description;
-        $food->category = $request->category;
-        $food->price = $request->price;
-
-        $food->save();
-
-        return redirect()->route('admin.foods', $food->id)->with('success', 'Food updated successfully.');
     }
 
+    $food->name = $request->name;
+    $food->description = $request->description;
+    $food->category_id = $request->category_id;
+    $food->price = $request->price;
+
+    $food->save();
+
+    return redirect()->route('admin.foods')->with('success', 'Food updated successfully.');
+}
     public function showBookings()
     {
         $bookings = Reservation::all(); // جلب كل الحجوزات
@@ -222,7 +221,23 @@ public function editFood($id)
         return redirect()->route('admin.bookings')->with('success', 'Booking deleted successfully.');
     }
 
+public function createCategory(){
+return view('admins.create-category');
+    }
+    public function storeCategory(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+    ]);
 
+    $image = $request->file('image');
+
+    Category::create([
+        'name' => $request->name,
+    ]);
+
+    return redirect()->route('admin.foods')->with('success', 'Food created successfully.');
+}
 
 
 }

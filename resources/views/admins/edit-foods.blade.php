@@ -1,59 +1,68 @@
 @extends('layouts.admin')
+
 @section('content')
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title mb-5 d-inline">Create Food Items</h5>
-                        <form method="POST" action="{{ route('admin.foods.update', $food->id) }}" enctype="multipart/form-data">
-                            @csrf
-                             @method('PUT')
-                            <!-- Email input -->
-                            <div class="form-outline mb-4 mt-4">
-                                <input type="text" name="name" id="form2Example1" class="form-control"
-                                    placeholder="name" value="{{ $food->name }}" />
+<div class="container mt-5">
+    <h2>Edit Food</h2>
 
-                            </div>
-                            <div class="form-outline mb-4 mt-4">
-                                <input type="text" name="price" id="form2Example1" class="form-control"
-                                    placeholder="price" value="{{ $food->price }}" />
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
-                            </div>
-                            <div class="form-outline mb-4 mt-4">
-                                <input type="file" name="image" id="form2Example1" class="form-control"  />
+    <form action="{{ route('admin.foods.update', $food->id) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
 
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleFormControlTextarea1">Description</label>
-                                <textarea class="form-control" name="description" id="exampleFormControlTextarea1" rows="3">{{ $food->description }}</textarea>
-                            </div>
-
-                            <div class="form-outline mb-4 mt-4">
-
-                                <select name="category" class="form-select  form-control"
-                                    aria-label="Default select example">
-                                    <option selected>Choose Meal</option>
-                                    <option value="breakfast">Breakfast</option>
-                                    <option value="launch">Launch</option>
-                                    <option value="dinner">Dinner</option>
-                                </select>
-                            </div>
-
-                            <br>
-
-
-
-                            <!-- Submit button -->
-                            <button type="submit" name="submit" class="btn btn-primary  mb-4 text-center">update</button>
-
-
-                        </form>
-
-                    </div>
-                </div>
-            </div>
+        <!-- Name -->
+        <div class="form-group mb-3">
+            <label for="name">Food Name</label>
+            <input type="text" name="name" value="{{ old('name', $food->name) }}" class="form-control" required>
+            @error('name') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
-    </div>
-    <script type="text/javascript"></script>
+
+        <!-- Description -->
+        <div class="form-group mb-3">
+            <label for="description">Description</label>
+            <textarea name="description" class="form-control" rows="4" required>{{ old('description', $food->description) }}</textarea>
+            @error('description') <small class="text-danger">{{ $message }}</small> @enderror
+        </div>
+
+        <!-- Category -->
+        <div class="form-group mb-3">
+            <label for="category_id">Category</label>
+            <select name="category_id" class="form-control" required>
+                <option value="">-- Select Category --</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category->id }}" {{ $food->category_id == $category->id ? 'selected' : '' }}>
+                        {{ $category->name }}
+                    </option>
+                @endforeach
+            </select>
+            @error('category_id') <small class="text-danger">{{ $message }}</small> @enderror
+        </div>
+
+        <!-- Price -->
+        <div class="form-group mb-3">
+            <label for="price">Price</label>
+            <input type="number" name="price" value="{{ old('price', $food->price) }}" class="form-control" required step="0.01">
+            @error('price') <small class="text-danger">{{ $message }}</small> @enderror
+        </div>
+
+        <!-- Image -->
+        <div class="form-group mb-3">
+            <label for="image">Image</label>
+            <input type="file" name="image" class="form-control">
+            @error('image') <small class="text-danger">{{ $message }}</small> @enderror
+
+            @if($food->image)
+                <div class="mt-2">
+                    <img src="{{ asset('img/' . $food->image) }}" alt="Current Image" width="150">
+                </div>
+            @endif
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-success">Update Food</button>
+        <a href="{{ route('admin.foods') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
 @endsection

@@ -6,7 +6,7 @@ use App\Models\Food\Checkout;
 use App\Models\Food\CheckoutItem;
 use App\Models\Food\cart; // Ensure you have the correct namespace for the Cart model
 use App\Models\Food\CartItem; // Ensure you have the correct namespace for the Cart
-
+use App\Models\Food\Category; // Ensure you have the correct namespace for the Category model
 use Illuminate\Http\Request;
 use App\Models\Food\Food; // Ensure you have the correct namespace for the Food model
 use Illuminate\Support\Facades\Auth;
@@ -26,17 +26,29 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
-    {
-    $breakfastFoods = Food::where('category', 'Breakfast')->take(4)->orderBy('id', 'desc')->get();
-    $launchFoods    = Food::where('category', 'Launch')->take(4)->orderBy('id', 'desc')->get();
-    $dinnerFoods    = Food::where('category', 'Dinner')->take(4)->orderBy('id', 'desc')->get();
+ // تأكد أنك مستورد المودي
 
-     $reviews = reviews::select()->take(4)
-    ->orderBy('id', 'desc')->get();
+public function index()
+{
+    // استخرج الكاتيجوريز المرتبطة بمنتجات فقط
+    $categories = Category::whereHas('foods')->get();
 
-    return view('home', compact('breakfastFoods', 'launchFoods', 'dinnerFoods', 'reviews'));
+    // جلب المنتجات لكل كاتيجوري باستخدام الـ id كمفتاح
+    $foodsByCategory = [];
+    foreach ($categories as $category) {
+        $foodsByCategory[$category->id] = Food::where('category_id', $category->id)
+            ->orderBy('id', 'desc')
+            ->take(4)
+            ->get();
     }
+
+    // مراجعات
+    $reviews = Reviews::orderBy('id', 'desc')->take(4)->get();
+
+    return view('home', compact('categories', 'foodsByCategory', 'reviews'));
+}
+
+
 
     public function about()
     {
